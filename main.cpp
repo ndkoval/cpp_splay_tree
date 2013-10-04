@@ -1,4 +1,4 @@
-#include "splay.cpp"
+#include "splay_tree.h"
 
 int main(int nArgs, char **args)
 {

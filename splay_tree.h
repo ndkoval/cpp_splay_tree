@@ -1,102 +1,11 @@
-#ifndef SPLAY_CPP
-#define SPLAY_CPP
+#ifndef SPLAY_TREE_H
+#define SPLAY_TREE_H
 
 #include <cstdlib>
 #include <iostream>
 
-//If
-template<bool Condition, typename TrueResult, typename FalseResult>
-struct IF;
-
-template<typename TrueResult, typename FalseResult>
-struct IF<true, TrueResult, FalseResult>
-{
-    typedef TrueResult result;
-};
-
-template<typename TrueResult, typename FalseResult>
-struct IF<false, TrueResult, FalseResult>
-{
-    typedef FalseResult result;
-};
-
-//Equals
-template<typename A, typename B>
-struct is_same
-{
-    static bool const result = false;
-};
-
-template<typename C>
-struct is_same<C, C>
-{
-    static bool const result = true;
-};
-
-//defined empty tree
-struct nil
-{
-    typedef nil left, right, data;
-};
-
-//Constant
-template<int Value>
-struct constant
-{
-    static int const value = Value;
-};
-
-//Tree node
-template<typename Data, typename Left, typename Right>
-struct node
-{
-    typedef Data data;
-    typedef Left left;
-    typedef Right right;
-};
-
-/*
- *Tree methods
-*/
-
-//Is child
-template<typename Tree, typename X>
-struct have_child
-{
-    static bool const result = is_same<typename Tree::left, X>::result || is_same<typename Tree::right, X>::result;
-};
-
-template<typename X>
-struct have_child<nil, X>
-{
-    static bool const result = false;
-};
-
-//Turn left rib
-template<typename Tree>
-struct turn_left_rib
-{
-    typedef node<typename Tree::left::data,
-        typename Tree::left::left,
-        node<typename Tree::data,
-            typename Tree::left::right,
-            typename Tree::right
-        >
-    > result;
-};
-
-//Turn right rib
-template<typename Tree>
-struct turn_right_rib
-{
-    typedef node<typename Tree::right::data,
-        node<typename Tree::data,
-            typename Tree::left,
-            typename Tree::right::left
-        >,
-        typename Tree::right::right
-    > result;
-};
+#include "tools.h"
+#include "binary_tree.h"
 
 //Zig
 template<typename Tree, bool is_left>
@@ -142,14 +51,14 @@ struct zig_zag
 template<typename Tree, typename X>
 struct splay
 {
-    typedef typename IF<have_child<Tree, X>::result,
+    typedef typename IF<is_child<Tree, X>::result,
         typename zig<Tree, is_same<typename Tree::left, X>::result >::result,
-        typename IF<have_child<typename Tree::left, X>::result,
+        typename IF<is_child<typename Tree::left, X>::result,
             typename IF<is_same<typename Tree::left::left, X>::result,
                 typename zig_zig<Tree, true>::result,
                 typename zig_zag<Tree, true>::result
             >::result,
-            typename IF<have_child<typename Tree::right, X>::result,
+            typename IF<is_child<typename Tree::right, X>::result,
                 typename IF<is_same<typename Tree::right::left, X>::result,
                     typename zig_zag<Tree, false>::result,
                     typename zig_zig<Tree, false>::result
@@ -171,25 +80,6 @@ struct splay
 
 template<typename X>
 struct splay<nil, X>
-{
-    typedef nil result;
-};
-
-//Find
-template<typename Tree, typename Value>
-struct find
-{
-    typedef typename IF<Value::value == Tree::data::value,
-        Tree,
-        typename IF<(Value::value < Tree::data::value),
-            typename find<typename Tree::left, Value>::result,
-            typename find<typename Tree::right, Value>::result
-        >::result
-    >::result result;
-};
-
-template<typename Value>
-struct find<nil, Value>
 {
     typedef nil result;
 };
@@ -283,35 +173,6 @@ private:
 public:
     typedef typename merge<typename splaied_tree::left, typename splaied_tree::right>::result result;
 };
-
-//Tree size
-template<typename Tree>
-struct size
-{
-    static size_t const result = 1 + size<typename Tree::left>::result + size<typename Tree::right>::result;
-};
-
-template<>
-struct size<nil>
-{
-    static size_t const result = 0;
-};
-
-template<typename Tree>
-void print_tree()
-{
-    std::cout << " (";
-    std::cout << Tree::data::value;
-    print_tree<typename Tree::left>();
-    print_tree<typename Tree::right>();
-    std::cout << ")";
-}
-
-template<>
-void print_tree<nil>()
-{
-    std::cout << " ()";
-}
 
 #endif
 
