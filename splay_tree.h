@@ -84,16 +84,6 @@ struct splay<nil, X>
     typedef nil result;
 };
 
-//Maximum
-template<typename Tree>
-struct max
-{
-    typedef typename IF<is_same<typename Tree::right, nil>::result,
-        Tree,
-        typename max<typename Tree::right>::result
-    >::result result;
-};
-
 //Merge
 template<typename Tree1, typename Tree2>
 struct merge

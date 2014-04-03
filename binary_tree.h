@@ -92,6 +92,38 @@ struct turn_right_rib
     > result;
 };
 
+//Maximum
+template<typename Tree>
+struct max
+{
+    typedef typename IF<is_same<typename Tree::right, nil>::result,
+        Tree,
+        typename max<typename Tree::right>::result
+    >::result result;
+};
+
+template<>
+struct max<nil>
+{
+    typedef nil result;
+};
+
+//Minimum
+template<typename Tree>
+struct min
+{
+    typedef typename IF<is_same<typename Tree::left, nil>::result,
+        Tree,
+        typename min<typename Tree::left>::result
+    >::result result;
+};
+
+template<>
+struct min<nil>
+{
+    typedef nil result;
+};
+
 //Print tree to standart output
 template<typename Tree>
 void print_tree()

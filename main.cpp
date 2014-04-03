@@ -22,14 +22,25 @@ int main(int nArgs, char **args)
                 >
             > tree;
 
-    print_tree<tree>();
-    typedef find<tree, constant<1> >::result X;
-    std::cout << std::endl;
-    print_tree<X>();
+    typedef node<constant<-1>,
+                nil,
+                nil
+            > tree2;
 
-    typedef splay<tree, X>::result splay_tree;
+    print_tree<tree>();
     std::cout << std::endl;
+
+    typedef merge<tree2, tree>::result merged_tree;
+    print_tree<merged_tree>();
+    std::cout << std::endl;
+
+    typedef find<merged_tree, constant<4> >::result X;
+    print_tree<X>();
+    std::cout << std::endl;
+
+    typedef splay<merged_tree, X>::result splay_tree;
     print_tree<splay_tree>();
+    std::cout << std::endl;
 
     return 0;
 }

@@ -24,8 +24,8 @@ struct is_same
     static bool const result = false;
 };
 
-template<typename C>
-struct is_same<C, C>
+template<typename A>
+struct is_same<A, A>
 {
     static bool const result = true;
 };
