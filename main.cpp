@@ -34,18 +34,12 @@ int main(int nArgs, char **args)
                 >
             > tree;
 
-    typedef node<constant<-1>,
-                nil,
-                nil
-            > tree2;
-
     print_tree<tree>();
     std::cout << std::endl;
 
-    typedef find<tree, constant<11> >::result::data X;
+    typedef remove<tree, constant<7> >::result t1;
 
-    typedef splay<tree, X>::result splay_tree;
-    print_tree<splay_tree>();
+    print_tree<t1>();
     std::cout << std::endl;
 
     return 0;

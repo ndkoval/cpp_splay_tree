@@ -37,4 +37,16 @@ struct constant
     static int const value = Value;
 };
 
+//True
+struct _true
+{
+    static bool const result = true;
+};
+
+//False
+struct _false
+{
+    static bool const result = false;
+};
+
 #endif

@@ -35,17 +35,36 @@ struct size<nil>
     static size_t const result = 0;
 };
 
+//Is list
+template<typename Tree>
+struct is_list
+{
+    static bool const result = IF<(is_same<
+            typename Tree::left, nil>::result &&
+            is_same<typename Tree::right, nil>::result)
+        ,
+        _true,
+        _false
+    >::result::result;
+};
+
 //Find element
 template<typename Tree, typename Value>
 struct find
 {
-    typedef typename IF<Value::value == Tree::data::value,
+    typedef typename IF<is_list<Tree>::result,
         Tree,
         typename IF<(Value::value < Tree::data::value),
             typename find<typename Tree::left, Value>::result,
             typename find<typename Tree::right, Value>::result
         >::result
     >::result result;
+};
+
+template<typename Tree>
+struct find<Tree, typename Tree::data>
+{
+    typedef Tree result;
 };
 
 template<typename Value>

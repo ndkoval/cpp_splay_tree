@@ -143,12 +143,15 @@ struct splay_even<Tree, nil>
 template<typename Tree, typename X>
 struct splay
 {
-    typedef typename IF<(depth<Tree, X>::result % 2 == 0),
-        splay_even<Tree, X>,
+private:
+    typedef typename find<Tree, X>::result::data Y;
+public:
+    typedef typename IF<(depth<Tree, Y>::result % 2 == 0),
+        splay_even<Tree, Y>,
         IF<(X::value < Tree::data::value),
             typename zig<
                 node<typename Tree::data,
-                    typename splay_even<typename Tree::left, X>::result,
+                    typename splay_even<typename Tree::left, Y>::result,
                     typename Tree::right
                 >,
                 true
@@ -156,7 +159,7 @@ struct splay
             typename zig<
                 node<typename Tree::data,
                     typename Tree::left,
-                    typename splay_even<typename Tree::right, X>::result
+                    typename splay_even<typename Tree::right, Y>::result
                 >,
                 false
             >::result
@@ -169,7 +172,7 @@ template<typename Tree1, typename Tree2>
 struct merge
 {
 private:
-    typedef typename splay<Tree1, typename max<Tree1>::result>::result splaied_tree1;
+    typedef typename splay<Tree1, typename max<Tree1>::result::data>::result splaied_tree1;
 public:
     typedef node<typename splaied_tree1::data,typename splaied_tree1::left, Tree2> result;
 };
@@ -192,21 +195,21 @@ struct split
 {
 private:
     typedef typename splay<Tree, X>::result splaied_tree;
-    static bool const root_is_less = (X::value <= splaied_tree::data::value);
+    static bool const root_is_less = (splaied_tree::data::value <= X::value);
 public:
     typedef typename IF<root_is_less,
-        node<typename Tree::data,
-            typename Tree::left,
+        node<typename splaied_tree::data,
+            typename splaied_tree::left,
             nil
         >,
-        typename Tree::left
+        typename splaied_tree::left
     >::result tree1;
 
     typedef typename IF<root_is_less,
-        typename Tree::right,
-        node<typename Tree::data,
+        typename splaied_tree::right,
+        node<typename splaied_tree::data,
             nil,
-            typename Tree::right
+            typename splaied_tree::right
         >
     >::result tree2;
 };
