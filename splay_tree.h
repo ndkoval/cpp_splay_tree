@@ -47,41 +47,121 @@ struct zig_zag
     >::result result;
 };
 
-//Splay
+
+//Depth
 template<typename Tree, typename X>
-struct splay
+struct depth
 {
-    typedef typename IF<is_child<Tree, X>::result,
-        typename zig<Tree, is_same<typename Tree::left, X>::result >::result,
-        typename IF<is_child<typename Tree::left, X>::result,
-            typename IF<is_same<typename Tree::left::left, X>::result,
-                typename zig_zig<Tree, true>::result,
-                typename zig_zag<Tree, true>::result
-            >::result,
-            typename IF<is_child<typename Tree::right, X>::result,
-                typename IF<is_same<typename Tree::right::left, X>::result,
-                    typename zig_zag<Tree, false>::result,
-                    typename zig_zig<Tree, false>::result
-                >::result,
-                typename IF<(X::data::value < Tree::data::value),
-                    node<typename Tree::data,
-                        typename splay<typename Tree::left, X>::result,
-                        typename Tree::right
-                    >,
-                    node<typename Tree::data,
-                        typename Tree::left,
-                        typename splay<typename Tree::right, X>::result
-                    >
-                >::result
-            >::result
-        >::result
-    >::result result;
+    static int const result = IF<X::value < Tree::data::value,
+        depth<typename Tree::left, X>,
+        depth<typename Tree::right, X>
+    >::result::result + 1;
 };
 
 template<typename X>
-struct splay<nil, X>
+struct depth<nil, X>
+{
+    static int const result = -1;
+};
+
+template<typename Tree>
+struct depth<Tree, typename Tree::data>
+{
+    static int const result = 0;
+};
+
+//Splay
+template<typename Tree, typename X>
+struct splay_even
+{
+    typedef typename IF<(X::value < Tree::data::value),
+        IF<(X::value < Tree::left::data::value), // at left side
+            zig_zig< // at left left
+                node<typename Tree::data,
+                    node<typename Tree::left::data,
+                        typename splay_even<typename Tree::left::left, X>::result,
+                        typename Tree::left::right
+                    >,
+                    typename Tree::right
+                >,
+                true
+            >,
+            zig_zag< // at left right
+                node<typename Tree::data,
+                    node<typename Tree::left::data,
+                        typename Tree::left::left,
+                        typename splay_even<typename Tree::left::right, X>::result
+                    >,
+                    typename Tree::right
+                >,
+                true
+            >
+        >,
+        IF<(X::value < Tree::right::data::value), // at right side
+            zig_zag< // at right left
+                node<typename Tree::data,
+                    typename Tree::left,
+                    node<typename Tree::right::data,
+                        typename splay_even<typename Tree::right::left, X>::result,
+                        typename Tree::right::right
+                    >
+                >,
+                false
+            >,
+            zig_zig< // at right right
+                node<typename Tree::data,
+                    typename Tree::left,
+                    node<typename Tree::right::data,
+                        typename Tree::right::left,
+                        typename splay_even<typename Tree::right::right, X>::result
+                    >
+                >,
+                false
+            >
+        >
+    >::result::result::result result;
+};
+
+template<typename Tree>
+struct splay_even<Tree, typename Tree::data>
+{
+    typedef Tree result;
+};
+
+template<typename X>
+struct splay_even<nil, X>
 {
     typedef nil result;
+};
+
+template<typename Tree>
+struct splay_even<Tree, nil>
+{
+    typedef Tree result;
+};
+
+template<typename Tree, typename X>
+struct splay
+{
+    typedef typename IF<(depth<Tree, X>::result % 2 == 0),
+        splay_even<Tree, X>,
+        IF<(X::value < Tree::data::value),
+            typename zig<
+                node<typename Tree::data,
+                    typename splay_even<typename Tree::left, X>::result,
+                    typename Tree::right
+                >,
+                true
+            >::result,
+            typename zig<
+                node<typename Tree::data,
+                    typename Tree::left,
+                    typename splay_even<typename Tree::right, X>::result
+                >,
+                false
+            >::result
+        >
+    >::result::result result;
 };
 
 //Merge

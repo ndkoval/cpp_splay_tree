@@ -10,6 +10,7 @@
 struct nil
 {
     typedef nil left, right, data;
+    static int const value = 0;
 };
 
 //Tree node
