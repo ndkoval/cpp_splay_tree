@@ -48,6 +48,19 @@ struct is_list
     >::result::result;
 };
 
+//Is child
+template<typename Tree, typename X>
+struct is_child
+{
+    static bool const result = is_same<typename Tree::left, X>::result || is_same<typename Tree::right, X>::result;
+};
+
+template<typename X>
+struct is_child<nil, X>
+{
+    static bool const result = false;
+};
+
 //Find element
 template<typename Tree, typename Value>
 struct find
@@ -71,19 +84,6 @@ template<typename Value>
 struct find<nil, Value>
 {
     typedef nil result;
-};
-
-//Is child
-template<typename Tree, typename X>
-struct is_child
-{
-    static bool const result = is_same<typename Tree::left, X>::result || is_same<typename Tree::right, X>::result;
-};
-
-template<typename X>
-struct is_child<nil, X>
-{
-    static bool const result = false;
 };
 
 //Turn left rib
@@ -110,6 +110,28 @@ struct turn_right_rib
         >,
         typename Tree::right::right
     > result;
+};
+
+//Depth
+template<typename Tree, typename X>
+struct depth
+{
+    static int const result = IF<X::value < Tree::data::value,
+        depth<typename Tree::left, X>,
+        depth<typename Tree::right, X>
+    >::result::result + 1;
+};
+
+template<typename X>
+struct depth<nil, X>
+{
+    static int const result = -1;
+};
+
+template<typename Tree>
+struct depth<Tree, typename Tree::data>
+{
+    static int const result = 0;
 };
 
 //Maximum

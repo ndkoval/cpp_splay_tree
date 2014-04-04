@@ -47,29 +47,6 @@ struct zig_zag
     >::result result;
 };
 
-
-//Depth
-template<typename Tree, typename X>
-struct depth
-{
-    static int const result = IF<X::value < Tree::data::value,
-        depth<typename Tree::left, X>,
-        depth<typename Tree::right, X>
-    >::result::result + 1;
-};
-
-template<typename X>
-struct depth<nil, X>
-{
-    static int const result = -1;
-};
-
-template<typename Tree>
-struct depth<Tree, typename Tree::data>
-{
-    static int const result = 0;
-};
-
 //Splay
 template<typename Tree, typename X>
 struct splay_even
